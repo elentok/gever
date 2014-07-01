@@ -1,4 +1,4 @@
-package gever_test
+package version_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,5 +9,5 @@ import (
 
 func TestGever(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Gever Suite")
+	RunSpecs(t, "Version Suite")
 }
