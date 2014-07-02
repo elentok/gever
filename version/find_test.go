@@ -16,3 +16,14 @@ var _ = Describe("FindInVersionFile", func() {
 	})
 
 })
+
+var _ = Describe("FindInPackageJSON", func() {
+
+	It("Parses the contents of a package.json file", func() {
+		v, err := version.FindInPackageJSON("test-fixtures/package.json")
+		Expect(err).To(BeNil())
+		Expect(v).NotTo(BeNil())
+		Expect(v.ToString()).To(Equal("5.4.3"))
+	})
+
+})
