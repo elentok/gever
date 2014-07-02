@@ -13,6 +13,7 @@ func main() {
 	app.Usage = "semver-based versioning tool"
 	app.Commands = []cli.Command{
 		commands.Show,
+		commands.Create,
 	}
 
 	app.Run(os.Args)

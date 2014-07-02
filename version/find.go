@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"path"
 
 	"gopkg.in/yaml.v1"
 )
@@ -69,25 +70,25 @@ func FindInYaml(filename string) (Version, error) {
 func Find(directory string, verbose bool) (Version, error) {
 
 	printIfVerbose("Searching for version in .semver", verbose)
-	v, err := FindInYaml(".semver")
+	v, err := FindInYaml(path.Join(directory, ".semver"))
 	if err == nil {
 		return v, nil
 	}
 
 	printIfVerbose("Searching for version in 'version'", verbose)
-	v, err = FindInVersionFile("version")
+	v, err = FindInVersionFile(path.Join(directory, "version"))
 	if err == nil {
 		return v, nil
 	}
 
 	printIfVerbose("Searching for version in 'VERSION'", verbose)
-	v, err = FindInVersionFile("VERSION")
+	v, err = FindInVersionFile(path.Join(directory, "VERSION"))
 	if err == nil {
 		return v, nil
 	}
 
 	printIfVerbose("Searching for version in package.json", verbose)
-	v, err = FindInPackageJSON("package.json")
+	v, err = FindInPackageJSON(path.Join(directory, "package.json"))
 	if err == nil {
 		return v, nil
 	}
