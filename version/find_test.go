@@ -17,6 +17,17 @@ var _ = Describe("FindInVersionFile", func() {
 
 })
 
+var _ = Describe("FindInYaml", func() {
+
+	It("Parses the contents of a yaml file", func() {
+		v, err := version.FindInYaml("test-fixtures/semver.yml")
+		Expect(err).To(BeNil())
+		Expect(v).NotTo(BeNil())
+		Expect(v.ToString()).To(Equal("3.4.5+hotfix3"))
+	})
+
+})
+
 var _ = Describe("FindInPackageJSON", func() {
 
 	It("Parses the contents of a package.json file", func() {
