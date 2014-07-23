@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cmd=${1:-build}
+version="$(gever show)"
+
+go $cmd -ldflags "-X main.version '$version'"
+
