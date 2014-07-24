@@ -44,30 +44,40 @@ var _ = Describe("FindInPackageJSON", func() {
 })
 
 var _ = Describe("FindInGitTag", func() {
-	var root string
+	var repo *git.Repo
 
 	BeforeEach(func() {
-		var err error
-		root, err = ioutil.TempDir("", "gever")
-		Expect(err).To(BeNil())
-		repo := git.NewRepo(root)
-		err = repo.Init()
-		Expect(err).To(BeNil())
-		ioutil.WriteFile(
-			filepath.Join(root, "file.txt"),
-			[]byte("Testing"),
-			0644,
-		)
-
-		repo.AddAll()
-		repo.Commit("initial commit")
-		repo.Tag("v4.5.6", "Bump to v4.5.6")
+		repo = createTestRepo()
 	})
 
-	It("Finds the last tagged version", func() {
-		version, err := version.FindInGitTag(root)
+	It("Finds the last tagged version (v4.5.6)", func() {
+		repo.Tag("v4.5.6", "Bump to v4.5.6")
+		version, err := version.FindInGitTag(repo.Path)
 		Expect(err).To(BeNil())
 		Expect(version.ToString()).To(Equal("4.5.6"))
 	})
 
+	It("Finds the last tagged version (4.5.6)", func() {
+		repo.Tag("4.5.6", "Bump to 4.5.6")
+		version, err := version.FindInGitTag(repo.Path)
+		Expect(err).To(BeNil())
+		Expect(version.ToString()).To(Equal("4.5.6"))
+	})
 })
+
+func createTestRepo() *git.Repo {
+	root, err := ioutil.TempDir("", "gever")
+	Expect(err).To(BeNil())
+	repo, err := git.NewRepo(root)
+	err = repo.Init()
+	Expect(err).To(BeNil())
+	ioutil.WriteFile(
+		filepath.Join(root, "file.txt"),
+		[]byte("Testing"),
+		0644,
+	)
+
+	repo.AddAll()
+	repo.Commit("initial commit")
+	return repo
+}

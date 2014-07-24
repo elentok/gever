@@ -71,14 +71,18 @@ func FindInYaml(filename string) (Version, error) {
 
 func Find(directory string, verbose bool) (Version, error) {
 
-	printIfVerbose("Searching for version in git history", verbose)
-	v, err := FindInGitTag(directory)
+	repo, err := git.NewRepo(directory)
 	if err == nil {
-		return v, nil
+		directory = repo.Path
+		printIfVerbose("Searching for version in git history", verbose)
+		v, err := FindInGitTag(directory)
+		if err == nil {
+			return v, nil
+		}
 	}
 
 	printIfVerbose("Searching for version in .semver", verbose)
-	v, err = FindInYaml(path.Join(directory, ".semver"))
+	v, err := FindInYaml(path.Join(directory, ".semver"))
 	if err == nil {
 		return v, nil
 	}
@@ -105,14 +109,21 @@ func Find(directory string, verbose bool) (Version, error) {
 }
 
 func FindInGitTag(path string) (Version, error) {
-	repo := git.NewRepo(path)
-	versionString, err := repo.Describe()
-	versionString = strings.TrimRight(versionString, "\r\n")
-	versionString = strings.TrimLeft(versionString, "v")
-
+	repo, err := git.NewRepo(path)
 	if err != nil {
 		return nil, err
 	}
+
+	versionString, err := repo.Describe("v[0-9]*")
+	if err != nil {
+		versionString, err = repo.Describe("[0-9]*")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	versionString = strings.TrimRight(versionString, "\r\n")
+	versionString = strings.TrimLeft(versionString, "v")
 
 	return Parse(versionString)
 }
