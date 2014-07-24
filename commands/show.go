@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -24,5 +25,5 @@ func show(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	println(v.ToString())
+	fmt.Println(v.ToString())
 }

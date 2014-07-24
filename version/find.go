@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 
@@ -101,8 +102,8 @@ func Find(directory string, verbose bool) (Version, error) {
 
 	printIfVerbose("Searching for version in package.json", verbose)
 	v, err = FindInPackageJSON(path.Join(directory, "package.json"))
-	if err == nil {
-		return v, nil
+	if os.IsNotExist(err) {
+		return nil, nil
 	}
 
 	return v, err

@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/elentok/gever/git"
+	"github.com/elentok/gever/utils"
 	"github.com/elentok/gever/version"
 )
 
@@ -12,10 +14,6 @@ var Create = cli.Command{
 	Name:      "create",
 	ShortName: "c",
 	Usage:     "creates new versions",
-	Flags: []cli.Flag{
-		cli.BoolFlag{"noop, n", "Only show the new version, don't do anything"},
-		cli.BoolFlag{"verbose, v", "Show more information"},
-	},
 	Subcommands: []cli.Command{
 		newCreateCommand("hotfix", "h", createHotfix),
 		newCreateCommand("rc", "", createRC),
@@ -32,19 +30,38 @@ func newCreateCommand(name, shortName string, create versionCreator) cli.Command
 		Name:      name,
 		ShortName: shortName,
 		Usage:     fmt.Sprintf("creates a %s", name),
+		Flags: []cli.Flag{
+			cli.BoolFlag{"noop, n", "Only show the new version, don't do anything"},
+			cli.BoolFlag{"quiet, q", "Don't ask before tagging"},
+			cli.BoolFlag{"verbose, v", "Show more information"},
+		},
 		Action: func(c *cli.Context) {
 			v, err := version.Find(".", c.Bool("verbose"))
 			if err != nil {
 				exitOnError(err)
 			}
+			if v == nil {
+				println("Previous version not found, defaulting to 0.0.0")
+				v = version.New(0, 0, 0, "")
+			}
 			create(v)
-			println(v.ToString())
 
 			if c.Bool("noop") {
+				fmt.Println(v.ToString())
 				return
 			}
 
-			// TODO: what to do now? (create git tag? update the version file?)
+			tag := fmt.Sprintf("v%s", v.ToString())
+			msg := fmt.Sprintf("Create git tag '%s'", tag)
+			if c.Bool("quiet") || utils.Confirm(msg, true) {
+				repo, err := git.NewRepo(".")
+				if err != nil {
+					exitOnError(err)
+				}
+				msg = fmt.Sprintf("Bumped version to %v", tag)
+				fmt.Println(msg)
+				repo.Tag(tag, msg)
+			}
 		},
 	}
 
