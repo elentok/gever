@@ -5,7 +5,9 @@ import (
 	"errors"
 	"io/ioutil"
 	"path"
+	"strings"
 
+	"github.com/elentok/gever/git"
 	"gopkg.in/yaml.v1"
 )
 
@@ -69,8 +71,14 @@ func FindInYaml(filename string) (Version, error) {
 
 func Find(directory string, verbose bool) (Version, error) {
 
+	printIfVerbose("Searching for version in git history", verbose)
+	v, err := FindInGitTag(directory)
+	if err == nil {
+		return v, nil
+	}
+
 	printIfVerbose("Searching for version in .semver", verbose)
-	v, err := FindInYaml(path.Join(directory, ".semver"))
+	v, err = FindInYaml(path.Join(directory, ".semver"))
 	if err == nil {
 		return v, nil
 	}
@@ -94,6 +102,19 @@ func Find(directory string, verbose bool) (Version, error) {
 	}
 
 	return v, err
+}
+
+func FindInGitTag(path string) (Version, error) {
+	repo := git.NewRepo(path)
+	versionString, err := repo.Describe()
+	versionString = strings.TrimRight(versionString, "\r\n")
+	versionString = strings.TrimLeft(versionString, "v")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return Parse(versionString)
 }
 
 func printIfVerbose(text string, verbose bool) {
