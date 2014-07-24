@@ -14,6 +14,7 @@ var Show = cli.Command{
 	Usage:     "shows the version of the current project",
 	Flags: []cli.Flag{
 		cli.BoolFlag{"verbose, v", "Show more details"},
+		cli.BoolFlag{"nonewline, n", "Do not print the trailing newline character"},
 	},
 	Action: show,
 }
@@ -25,5 +26,8 @@ func show(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	fmt.Println(v.ToString())
+	fmt.Printf(v.ToString())
+	if !c.Bool("nonewline") {
+		fmt.Println()
+	}
 }
