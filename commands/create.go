@@ -31,9 +31,15 @@ func newCreateCommand(name, shortName string, create versionCreator) cli.Command
 		ShortName: shortName,
 		Usage:     fmt.Sprintf("creates a %s", name),
 		Flags: []cli.Flag{
-			cli.BoolFlag{"noop, n", "Only show the new version, don't do anything"},
-			cli.BoolFlag{"quiet, q", "Don't ask before tagging"},
-			cli.BoolFlag{"verbose, v", "Show more information"},
+			cli.BoolFlag{
+				Name:  "noop, n",
+				Usage: "Only show the new version, don't do anything"},
+			cli.BoolFlag{
+				Name:  "quiet, q",
+				Usage: "Don't ask before tagging"},
+			cli.BoolFlag{
+				Name:  "verbose, v",
+				Usage: "Show more information"},
 		},
 		Action: func(c *cli.Context) {
 			v, err := version.Find(".", c.Bool("verbose"))

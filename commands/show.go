@@ -13,8 +13,12 @@ var Show = cli.Command{
 	ShortName: "s",
 	Usage:     "shows the version of the current project",
 	Flags: []cli.Flag{
-		cli.BoolFlag{"verbose, v", "Show more details"},
-		cli.BoolFlag{"nonewline, n", "Do not print the trailing newline character"},
+		cli.BoolFlag{
+			Name:  "verbose, v",
+			Usage: "Show more details"},
+		cli.BoolFlag{
+			Name:  "nonewline, n",
+			Usage: "Do not print the trailing newline character"},
 	},
 	Action: show,
 }
